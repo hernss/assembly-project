@@ -72,7 +72,7 @@
 task1Init:
 		PUSH	{LR}					// Save PC
 
-		BL		ledInit					// ledInit();
+		BL		pin_init				// ledInit();
 
 		MOVS	R0, #LEDoN
 		BL		led						// led(LEDoN);
@@ -115,7 +115,7 @@ task1UpdateEnd:
 task2Init:
 		PUSH	{LR}					// Save PC
 
-		BL		ledInit					// ledInit();
+		BL		pin_init					// ledInit();
 
 		MOVS	R0, #LEDoFF
 		BL		led						// led(LEDoFF);
@@ -193,17 +193,27 @@ led:
 		BNE		ledOff					// Jump if (R0 != LEDoN)
 
 ledOn:
+        /*LPC1769
         LDR		R3, =FIO0SET			// R3 <- address of FIO0SET
         LDR		R1, =LED_MASK			// R1 <- address of LED_MASK
 		STR		R1, [R3]				// mem[R3] <- R1 Write FIO0SET
 										// LED2 ON
+		*/
+		LDR 	R0,=(1 << 13)			@ R0 = 1<<13
+		LDR 	R2,=#PORTC_ODR   		@ load to r2 PORTC_ODR adress
+		STR 	R0, [R2]          		@ store!
 		B		ledEnd
 
 ledOff:
+		/*LPC1769
         LDR		R3, =FIO0CLR			// R3 <- address of FIO0CLR
         LDR		R1, =LED_MASK			// R1 <- address of LED_MASK
 		STR		R1, [R3]				// mem[R3] <- R1 Write FIO0CLR
 										// LED2 OFF
+		*/
+		MOV		R0,#0					@ R0 = 0
+		LDR 	R2, =#PORTC_ODR   		@ load to r2 PORTC_ODR adress
+		STR 	R0, [R2]          		@ store!
 
 ledEnd:
 		POP		{PC}					// Return
@@ -230,7 +240,7 @@ delayEnd:
 
 		.size	delay, . - delay
 
-
+//Inicializacion del pin C13 para blue pill
 		.type	pin_init, %function
 pin_init:
 		PUSH	{LR}
