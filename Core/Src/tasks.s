@@ -167,6 +167,29 @@ UpdateOutput:
 		POP		{PC}
 
 		.size UpdateOutput, . - UpdateOutput
+
+#elif (TEST == TEST_3)
+		.global	UpdateOutputReference
+		.type	UpdateOutputReference, %function
+		// R0: Led Status
+		// R1: Delay
+UpdateOutputReference:
+		PUSH	{LR}
+
+		LDR		R1,[R0]				// La primera posicion es el estado del led
+		LDR		R2,[R0,#4]			// La segunda posicion es el delay
+
+		MVNS	R1,R1				// R1 = not R1
+		ANDS	R1,#1				// R1&=0x01
+		LSLS	R1,R1,#13			// R1<<=13
+		LDR 	R3, =#PORTC_ODR   	// load to r3 PORTC_ODR adress
+		STR 	R1, [R3]          	// flush output
+		MOV		R0, R2				// R2 -> R0
+		BL		delay				// Ejecuto un delay de R0 instrucciones
+
+		POP		{PC}
+
+		.size UpdateOutputReference, . - UpdateOutputReference
 #endif
 
 

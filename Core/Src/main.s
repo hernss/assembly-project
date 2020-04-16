@@ -61,7 +61,7 @@
 		.comm	taskCnt,4		// static volatile uint32_t taskCnt;
 
 		.comm	tick_ct, 4		// static volatile uint32_t taskCnt;
-
+		.comm	paramArray,8
 
 /*------------------------------------------------------------------*/
 		.syntax		unified
@@ -182,12 +182,12 @@ main:
 		STR		R0, [R1]      			// mem[R1] <- R0 => mainLoopCnt = 0;
 mainLoop:
 
-		MOV		R0, #LEDoN
-		MOV		R1, #LEDoNdELAY
+		LDR		R0, =LEDoN
+		LDR		R1, =LEDoNdELAY
 		BL		UpdateOutput
 
-		MOV		R0, #LEDoFF
-		MOV		R1, #LEDoFFdELAY
+		LDR		R0, =LEDoFF
+		LDR		R1, =LEDoFFdELAY
 		BL		UpdateOutput
 
 
@@ -202,13 +202,71 @@ mainLoopEnd:							// We should never reach here
 
 		POP		{PC}					// Return
 
-taskCntError:							// We should never reach here
-		B		taskCntError
 
 		.size	main, . - main
 
 
-.global	systemInit
+		.global	systemInit
+		.type	systemInit, %function
+systemInit:
+		// R0, R1: argument / result / scratch register
+		// R2, R3: argument / scratch register
+		PUSH	{LR}					// Save PC
+										// HW & SW initialization here
+		BL		pin_init				// Inicializo el pin del led como salida
+
+
+		POP		{PC}					// Retun
+
+		.size	systemInit, . - systemInit
+
+#elif (TEST == TEST_3)
+
+		.global		main
+		.type		main, %function
+main:
+		PUSH	{LR}					// Save PC
+
+    	BL		systemInit				// systemInit();
+		LDR		R1, =mainLoopCnt		// R1 <- address of mainLoopCnt
+		MOVS	R0, #0					// R0 <- 0
+		STR		R0, [R1]      			// mem[R1] <- R0 => mainLoopCnt = 0;
+mainLoop:
+
+
+		LDR		R0, =paramArray
+		LDR		R1, =LEDoN
+		STR		R1, [R0]
+
+		LDR		R1, =LEDoNdELAY
+		STR		R1, [R0,#4]
+		BL		UpdateOutputReference
+
+		LDR		R0, =paramArray
+		LDR		R1, =LEDoFF
+		STR		R1, [R0]
+
+		LDR		R1, =LEDoFFdELAY
+		STR		R1, [R0,#4]
+		BL		UpdateOutputReference
+
+
+		LDR		R1, =mainLoopCnt		// R1 <- address of mainLoopCnt
+  		LDR		R0, [R1]				// R0 <- mem[R1]
+		ADDS	R0, R0, #1				// R0 <- R0 + 1
+		STR		R0, [R1]      			// mem[R1] <- R0 => mainLoopCnt++;
+
+		B		mainLoop				// Continue forever
+
+mainLoopEnd:							// We should never reach here
+
+		POP		{PC}					// Return
+
+
+		.size	main, . - main
+
+
+		.global	systemInit
 		.type	systemInit, %function
 systemInit:
 		// R0, R1: argument / result / scratch register
