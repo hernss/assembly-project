@@ -62,7 +62,7 @@
 #define TEST_6 (6)	/* Test modified task # ... */
 
 
-#define TEST (TEST_1)
+#define TEST (TEST_2)
 
 
 #endif

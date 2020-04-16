@@ -148,6 +148,25 @@ task2UpdateEnd:
 
 		.size	task2Update, . - task2Update
 
+#elif (TEST == TEST_2)
+		.global	UpdateOutput
+		.type	UpdateOutput, %function
+		// R0: Led Status
+		// R1: Delay
+UpdateOutput:
+		PUSH	{LR}
+
+		MVNS	R0,R0				// R0 = not R0
+		ANDS	R0,#1				// R0&=0x01
+		LSLS	R0,R0,#13			// R0<<=13
+		LDR 	R2, =#PORTC_ODR   	// load to r2 PORTC_ODR adress
+		STR 	R0, [R2]          	// flush output
+		MOV		R0, R1				// R1 -> R0
+		BL		delay				// Ejecuto un delay de R0 instrucciones
+
+		POP		{PC}
+
+		.size UpdateOutput, . - UpdateOutput
 #endif
 
 
@@ -241,6 +260,7 @@ delayEnd:
 		.size	delay, . - delay
 
 //Inicializacion del pin C13 para blue pill
+		.global pin_init
 		.type	pin_init, %function
 pin_init:
 		PUSH	{LR}
@@ -252,6 +272,8 @@ pin_init:
 		LDR 	R2, =#GPIOC_CHR
 		STR 	R1, [R2]
 		POP		{PC}
+
+		.size	pin_init, . - pin_init
 
 		.end
 // .end marks the end of the assembly file. as does not process anything in

@@ -182,9 +182,30 @@ main:
 		STR		R0, [R1]      			// mem[R1] <- R0 => mainLoopCnt = 0;
 mainLoop:
 
+		MOV		R0, #LEDoN
+		MOV		R1, #LEDoNdELAY
+		BL		UpdateOutput
+
+		MOV		R0, #LEDoFF
+		MOV		R1, #LEDoFFdELAY
+		BL		UpdateOutput
 
 
+		LDR		R1, =mainLoopCnt		// R1 <- address of mainLoopCnt
+  		LDR		R0, [R1]				// R0 <- mem[R1]
+		ADDS	R0, R0, #1				// R0 <- R0 + 1
+		STR		R0, [R1]      			// mem[R1] <- R0 => mainLoopCnt++;
 
+		B		mainLoop				// Continue forever
+
+mainLoopEnd:							// We should never reach here
+
+		POP		{PC}					// Return
+
+taskCntError:							// We should never reach here
+		B		taskCntError
+
+		.size	main, . - main
 
 
 .global	systemInit
