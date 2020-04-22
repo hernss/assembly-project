@@ -25,9 +25,9 @@
 #define	RCC_APB2ENR	0x40021018
 
 
-#define LEDdELAY	200000
+#define LEDdELAY	2000000
 #define LEDoNdELAY	LEDdELAY
-#define LEDoFFdELAY	(LEDdELAY * 2)
+#define LEDoFFdELAY	(LEDdELAY * 8)
 
 #define LEDoFF	false
 #define LEDoN	true

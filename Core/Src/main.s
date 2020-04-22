@@ -47,7 +47,7 @@
 
 // Project header
 #include "main.h"
-
+#include "tasks.h"
 
 // ------ Public functions -----------------------------------------
 		.extern		task1Init, task1Update
@@ -63,11 +63,26 @@
 		.comm	tick_ct, 4		// static volatile uint32_t taskCnt;
 		.comm	paramArray,8
 
+/*------TEST 4------------------------------------------------------*/
+
+		.comm	baseAddrArray8,  256 * 1	//256 elementos de 1byte
+		.comm	baseAddrArray16, 256 * 2	//256 elementos de 2bytes
+		.comm	baseAddrArray32, 256 * 4	//256 elementos de 4bytes
+
+		.comm	addrParametrosReferencia, 5 * 4 //5 elementos de 4bytes
+		//Base Address
+		//Tipo (8, 16 o 32)
+		//Size (0 a 256)
+		//Process (null)
+		//Valor a buscar (4 bytes)
+
 /*------------------------------------------------------------------*/
 		.syntax		unified
 	    .arch       armv7-m
 		.cpu		cortex-m0
 		.thumb
+
+
 
 		.section	.text
 		.align		2
@@ -206,20 +221,6 @@ mainLoopEnd:							// We should never reach here
 		.size	main, . - main
 
 
-		.global	systemInit
-		.type	systemInit, %function
-systemInit:
-		// R0, R1: argument / result / scratch register
-		// R2, R3: argument / scratch register
-		PUSH	{LR}					// Save PC
-										// HW & SW initialization here
-		BL		pin_init				// Inicializo el pin del led como salida
-
-
-		POP		{PC}					// Retun
-
-		.size	systemInit, . - systemInit
-
 #elif (TEST == TEST_3)
 
 		.global		main
@@ -265,6 +266,53 @@ mainLoopEnd:							// We should never reach here
 
 		.size	main, . - main
 
+#elif (TEST == TEST_4)
+
+		.global		main
+		.type		main, %function
+main:
+		PUSH	{LR}					// Save PC
+
+    	BL		systemInit				// systemInit();
+		LDR		R1, =mainLoopCnt		// R1 <- address of mainLoopCnt
+		MOVS	R0, #0					// R0 <- 0
+		STR		R0, [R1]      			// mem[R1] <- R0 => mainLoopCnt = 0;
+mainLoop:
+
+
+		LDR		R0, =paramArray
+		LDR		R1, =LEDoN
+		STR		R1, [R0]
+
+		LDR		R1, =LEDoNdELAY
+		STR		R1, [R0,#4]
+		BL		UpdateOutputReference
+
+		LDR		R0, =paramArray
+		LDR		R1, =LEDoFF
+		STR		R1, [R0]
+
+		LDR		R1, =LEDoFFdELAY
+		STR		R1, [R0,#4]
+		BL		UpdateOutputReference
+
+
+		LDR		R1, =mainLoopCnt		// R1 <- address of mainLoopCnt
+  		LDR		R0, [R1]				// R0 <- mem[R1]
+		ADDS	R0, R0, #1				// R0 <- R0 + 1
+		STR		R0, [R1]      			// mem[R1] <- R0 => mainLoopCnt++;
+
+		B		mainLoop				// Continue forever
+
+mainLoopEnd:							// We should never reach here
+
+		POP		{PC}					// Return
+
+
+		.size	main, . - main
+
+#endif
+
 
 		.global	systemInit
 		.type	systemInit, %function
@@ -280,13 +328,11 @@ systemInit:
 
 		.size	systemInit, . - systemInit
 
-
-
-#endif
-
-
-
-
+/*
+.comm	baseAddrArray8,  256 * 1	//256 elementos de 1byte
+.comm	baseAddrArray16, 256 * 2	//256 elementos de 2bytes
+.comm	baseAddrArray32, 256 * 4	//256 elementos de 4bytes
+*/
 
 		.end
 // .end marks the end of the assembly file. as does not process anything in
