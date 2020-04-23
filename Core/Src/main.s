@@ -65,9 +65,7 @@
 
 /*------TEST 4------------------------------------------------------*/
 
-		.comm	baseAddrArray8,  256 * 1	//256 elementos de 1byte
-		.comm	baseAddrArray16, 256 * 2	//256 elementos de 2bytes
-		.comm	baseAddrArray32, 256 * 4	//256 elementos de 4bytes
+
 
 		.comm	addrParametrosReferencia, 5 * 4 //5 elementos de 4bytes
 		//Base Address
@@ -86,6 +84,22 @@
 
 		.section	.text
 		.align		2
+
+baseAddrArray8:       .byte 1,2,3,4,4,1,1,1,2,5
+endArray8:
+		.size	baseAddrArray8, . - baseAddrArray8
+
+baseAddrArray16:      .short 1,2,3,4,4,1,1,1,2,5
+endArray16:
+		.size	baseAddrArray16, . - baseAddrArray16
+
+baseAddrArray32:      .word 1,2,3,4,4,1,1,1,2,5
+endArray32:
+		.size	baseAddrArray32, . - baseAddrArray32
+
+		.equ	SIZE_ARRAY_8, (endArray8 - baseAddrArray8)
+		.equ	SIZE_ARRAY_16, (endArray16 - baseAddrArray16)/2
+		.equ	SIZE_ARRAY_32, (endArray32 - baseAddrArray32)/4
 
 
 #if (TEST == TEST_1)	/* Test original two tasks without arguments */
@@ -279,22 +293,62 @@ main:
 		STR		R0, [R1]      			// mem[R1] <- R0 => mainLoopCnt = 0;
 mainLoop:
 
+		//Prueba para array de 8bits
+		LDR		R0, =addrParametrosReferencia
+		LDR		R1, =baseAddrArray8
+		STR		R1, [R0,#OFFSET_BASE_ADDRESS]
 
-		LDR		R0, =paramArray
-		LDR		R1, =LEDoN
-		STR		R1, [R0]
+		LDR		R1, =BYTE_ARRAY
+		STR		R1, [R0,#OFFSET_ARRAY_TYPE]
 
-		LDR		R1, =LEDoNdELAY
-		STR		R1, [R0,#4]
-		BL		UpdateOutputReference
+		LDR		R1, =SIZE_ARRAY_8
+		STR		R1, [R0,#OFFSET_ARRAY_SIZE]
 
-		LDR		R0, =paramArray
-		LDR		R1, =LEDoFF
-		STR		R1, [R0]
+		MOVS	R1, #0
+		STR		R1, [R0,#OFFSET_PROCESS]
 
-		LDR		R1, =LEDoFFdELAY
-		STR		R1, [R0,#4]
-		BL		UpdateOutputReference
+		MOVS	R1, #3		//VALOR A BUSCAR
+		STR		R1, [R0,#OFFSET_VALUE]
+
+		BL		taskBuscarValor
+
+		//Prueba para array de 16bits
+		LDR		R0, =addrParametrosReferencia
+		LDR		R1, =baseAddrArray16
+		STR		R1, [R0,#OFFSET_BASE_ADDRESS]
+
+		LDR		R1, =SHORT_ARRAY
+		STR		R1, [R0,#OFFSET_ARRAY_TYPE]
+
+		LDR		R1, =SIZE_ARRAY_16
+		STR		R1, [R0,#OFFSET_ARRAY_SIZE]
+
+		MOVS	R1, #0
+		STR		R1, [R0,#OFFSET_PROCESS]
+
+		MOVS	R1, #3		//VALOR A BUSCAR
+		STR		R1, [R0,#OFFSET_VALUE]
+
+		BL		taskBuscarValor
+
+		//Prueba para array de 32bits
+		LDR		R0, =addrParametrosReferencia
+		LDR		R1, =baseAddrArray32
+		STR		R1, [R0,#OFFSET_BASE_ADDRESS]
+
+		LDR		R1, =WORD_ARRAY
+		STR		R1, [R0,#OFFSET_ARRAY_TYPE]
+
+		LDR		R1, =SIZE_ARRAY_32
+		STR		R1, [R0,#OFFSET_ARRAY_SIZE]
+
+		MOVS	R1, #0
+		STR		R1, [R0,#OFFSET_PROCESS]
+
+		MOVS	R1, #3		//VALOR A BUSCAR
+		STR		R1, [R0,#OFFSET_VALUE]
+
+		BL		taskBuscarValor
 
 
 		LDR		R1, =mainLoopCnt		// R1 <- address of mainLoopCnt
@@ -327,12 +381,6 @@ systemInit:
 		POP		{PC}					// Retun
 
 		.size	systemInit, . - systemInit
-
-/*
-.comm	baseAddrArray8,  256 * 1	//256 elementos de 1byte
-.comm	baseAddrArray16, 256 * 2	//256 elementos de 2bytes
-.comm	baseAddrArray32, 256 * 4	//256 elementos de 4bytes
-*/
 
 		.end
 // .end marks the end of the assembly file. as does not process anything in

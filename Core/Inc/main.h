@@ -62,7 +62,19 @@
 #define TEST_6 (6)	/* Test modified task # ... */
 
 
-#define TEST (TEST_2)
+#define TEST (TEST_4)
+
+#define BYTE_ARRAY 8
+#define SHORT_ARRAY 16
+#define WORD_ARRAY 32
+
+#define MAX_RECORDS 256
+
+#define OFFSET_BASE_ADDRESS 0
+#define OFFSET_ARRAY_TYPE 4
+#define OFFSET_ARRAY_SIZE 8
+#define OFFSET_PROCESS 12
+#define OFFSET_VALUE 16
 
 
 #endif

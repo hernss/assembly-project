@@ -190,6 +190,26 @@ UpdateOutputReference:
 		POP		{PC}
 
 		.size UpdateOutputReference, . - UpdateOutputReference
+
+#elif (TEST == TEST_4)
+
+		.global	taskBuscarValor
+		.type	taskBuscarValor, %function
+		// R0: Direccion a un array con los parametros de la funcion
+taskBuscarValor:
+		PUSH	{LR}
+
+		LDR		R1,[R0,#OFFSET_BASE_ADDRESS]	// Direccion base del array
+		LDR		R2,[R0,#OFFSET_ARRAY_TYPE]		// Tipo de datos del array
+		LDR		R3,[R0,$OFFSET_ARRAY_SIZE]		// Tamaño del array
+		LDR		R4,[R0,#OFFSET_PROCESS]			// Proccess
+		LDR		R5,[R0,#OFFSET_VALUE]			// Valor a buscar
+
+
+		POP		{PC}
+
+		.size taskBuscarValor, . - taskBuscarValor
+
 #endif
 
 
