@@ -201,11 +201,55 @@ taskBuscarValor:
 
 		LDR		R1,[R0,#OFFSET_BASE_ADDRESS]	// Direccion base del array
 		LDR		R2,[R0,#OFFSET_ARRAY_TYPE]		// Tipo de datos del array
-		LDR		R3,[R0,$OFFSET_ARRAY_SIZE]		// Tamaño del array
+		LDR		R3,[R0,#OFFSET_ARRAY_SIZE]		// Tamaño del array
 		LDR		R4,[R0,#OFFSET_PROCESS]			// Proccess
 		LDR		R5,[R0,#OFFSET_VALUE]			// Valor a buscar
 
+		MOVS	R0,#0					//Limpio la variable de retorno
 
+		CMP		R3,#0
+		BEQ		finBusqueda				//Si el Array tiene tamaño 0 no busco nada
+
+		CMP		R3,#255
+		BLS		comprobacionDatos		//Si es menor o igual a 255 entonces salto
+
+		MOVS	R3,#255					//Sino sobreescribo R3 con 255 para no pasarme en la busqueda
+
+comprobacionDatos:
+		MULS	R3,R3,R2				//Multiplico la cantidad de registros por la cantidad de bytes
+										//De esta manera me adapto a los distintos tamaños de registros
+
+		CMP		R2,BYTE_ARRAY			//Compruebo que el tipo de datos sea valido para la tarea
+		BNE		probarShort
+		LDR		R7, =0xFF				//Seteo la mascara para el BYTE
+		B		iniciarBusqueda
+probarShort:
+		CMP		R2,SHORT_ARRAY
+		BNE		probarWord
+		LDR		R7, =0xFFFF				//Seteo la mascara para el Short
+		B		iniciarBusqueda
+probarWord:
+		CMP		R2,WORD_ARRAY
+		BNE		finBusqueda				//Si llegue hasta aca es porque el array no tiene un tipo de datos aceptado por la tarea
+		LDR		R7, =0xFFFFFFFF			//Seteo la mascara para el WORD
+
+iniciarBusqueda:
+		SUBS 	R3,R3,R2				//Le resto la cantidad de bytes del registro
+		LDR		R6,[R1, R3]				//Incializo el indice
+		AND		R6,R6,R7				//Aplico la mascara que tengo en R7
+
+		CMP		R6, R5
+		BNE		comprobarFinal			//Si no coincide con el valor que busco salto
+
+		ADDS	R0,R0,#1				//Si llego aca es porque coincide con el valor que busco
+
+comprobarFinal:
+		CMP 	R3,#0					//Si R3 es cero ya recorri todo el array
+		BNE		iniciarBusqueda
+
+
+
+finBusqueda:
 		POP		{PC}
 
 		.size taskBuscarValor, . - taskBuscarValor

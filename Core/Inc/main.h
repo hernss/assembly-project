@@ -64,9 +64,9 @@
 
 #define TEST (TEST_4)
 
-#define BYTE_ARRAY 8
-#define SHORT_ARRAY 16
-#define WORD_ARRAY 32
+#define BYTE_ARRAY 1
+#define SHORT_ARRAY 2
+#define WORD_ARRAY 4
 
 #define MAX_RECORDS 256
 

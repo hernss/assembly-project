@@ -83,9 +83,11 @@
 
 
 		.section	.text
-		.align		2
 
-baseAddrArray8:       .byte 1,2,3,4,4,1,1,1,2,5
+
+#if (TEST == TEST_4)
+
+baseAddrArray8:       .byte 1,1,9,4,3,45,4,9,3,1,3
 endArray8:
 		.size	baseAddrArray8, . - baseAddrArray8
 
@@ -100,7 +102,10 @@ endArray32:
 		.equ	SIZE_ARRAY_8, (endArray8 - baseAddrArray8)
 		.equ	SIZE_ARRAY_16, (endArray16 - baseAddrArray16)/2
 		.equ	SIZE_ARRAY_32, (endArray32 - baseAddrArray32)/4
+#endif
 
+
+		.align		2
 
 #if (TEST == TEST_1)	/* Test original two tasks without arguments */
 /*-------------------------------------------------------------------*/
@@ -326,7 +331,7 @@ mainLoop:
 		MOVS	R1, #0
 		STR		R1, [R0,#OFFSET_PROCESS]
 
-		MOVS	R1, #3		//VALOR A BUSCAR
+		MOVS	R1, #1		//VALOR A BUSCAR
 		STR		R1, [R0,#OFFSET_VALUE]
 
 		BL		taskBuscarValor
@@ -345,7 +350,7 @@ mainLoop:
 		MOVS	R1, #0
 		STR		R1, [R0,#OFFSET_PROCESS]
 
-		MOVS	R1, #3		//VALOR A BUSCAR
+		MOVS	R1, #4		//VALOR A BUSCAR
 		STR		R1, [R0,#OFFSET_VALUE]
 
 		BL		taskBuscarValor
