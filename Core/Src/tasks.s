@@ -213,7 +213,7 @@ taskBuscarValor:
 		CMP		R3,#255
 		BLS		comprobacionDatos		//Si es menor o igual a 255 entonces salto
 
-		MOVS	R3,#255					//Sino sobreescribo R3 con 255 para no pasarme en la busqueda
+		MOVS	R3,#256					//Sino sobreescribo R3 con 256 (mas adelante le resto 1)  para no pasarme en la busqueda
 
 comprobacionDatos:
 		MULS	R3,R3,R2				//Multiplico la cantidad de registros por la cantidad de bytes
@@ -234,7 +234,7 @@ probarWord:
 		LDR		R7, =0xFFFFFFFF			//Seteo la mascara para el WORD
 
 iniciarBusqueda:
-		SUBS 	R3,R3,R2				//Le resto la cantidad de bytes del registro
+		SUBS 	R3,R3,R2				//Le resto la cantidad de bytes del registro. Lo hago en esta instancia porque el valor 0 es valido
 		LDR		R6,[R1, R3]				//Incializo el indice
 		AND		R6,R6,R7				//Aplico la mascara que tengo en R7
 
@@ -246,8 +246,6 @@ iniciarBusqueda:
 comprobarFinal:
 		CMP 	R3,#0					//Si R3 es cero ya recorri todo el array
 		BNE		iniciarBusqueda
-
-
 
 finBusqueda:
 		POP		{PC}
